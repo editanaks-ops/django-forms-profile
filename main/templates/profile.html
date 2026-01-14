@@ -1,0 +1,25 @@
+<script>
+  (function () {
+    const input = document.getElementById('msgSearch');
+    const items = document.querySelectorAll('.msg-item');
+    const noResults = document.getElementById('noResults');
+
+    if (!input) return;
+
+    input.addEventListener('input', function () {
+      const q = input.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const hay = item.getAttribute('data-search') || '';
+        const ok = hay.includes(q);
+        item.classList.toggle('d-none', !ok);
+        if (ok) visibleCount++;
+      });
+
+      if (noResults) {
+        noResults.classList.toggle('d-none', visibleCount !== 0);
+      }
+    });
+  })();
+</script>
