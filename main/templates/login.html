@@ -1,25 +1,35 @@
 {% extends "base.html" %}
-
 {% block title %}Вход{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-5">
     <div class="card shadow-sm">
       <div class="card-body">
-        <h1 class="h3 mb-3">Вход</h1>
+        <h1 class="h4 mb-3">Вход</h1>
 
         <form method="post">
           {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-primary">Войти</button>
+          <input type="hidden" name="next" value="{{ next }}">
+
+          <div class="mb-3">
+            <label class="form-label">Имя пользователя</label>
+            {{ form.username }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Пароль</label>
+            {{ form.password }}
+          </div>
+
+          <button class="btn btn-primary w-100" type="submit">Войти</button>
         </form>
 
-        <hr>
-        <a href="{% url 'register' %}">Регистрация</a>
+        <div class="mt-3 text-center">
+          <a href="{% url 'register' %}">Регистрация</a>
+        </div>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
-

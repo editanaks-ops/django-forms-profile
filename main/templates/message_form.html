@@ -1,24 +1,38 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <title>Сообщение</title>
-</head>
-<body>
-  <h1>Отправить сообщение</h1>
+{% extends "base.html" %}
+{% block title %}Новое сообщение{% endblock %}
 
-  {% if messages %}
-    {% for m in messages %}
-      <p>{{ m }}</p>
-    {% endfor %}
-  {% endif %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="mb-3">Новое сообщение</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Отправить</button>
-  </form>
+        <form method="post" novalidate>
+          {% csrf_token %}
 
-  <p><a href="{% url 'profile' %}">Профиль</a></p>
-</body>
-</html>
+          <div class="mb-3">
+            <label class="form-label">Имя</label>
+            <input class="form-control" name="name" value="{{ form.name.value|default:'' }}">
+            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" name="email" value="{{ form.email.value|default:'' }}">
+            {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Текст</label>
+            <textarea class="form-control" name="text" rows="5">{{ form.text.value|default:'' }}</textarea>
+            {% if form.text.errors %}<div class="text-danger small">{{ form.text.errors }}</div>{% endif %}
+          </div>
+
+          <button class="btn btn-primary w-100">Отправить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

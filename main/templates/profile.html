@@ -1,25 +1,60 @@
-<script>
-  (function () {
-    const input = document.getElementById('msgSearch');
-    const items = document.querySelectorAll('.msg-item');
-    const noResults = document.getElementById('noResults');
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
 
-    if (!input) return;
+{% block content %}
+<div class="row g-4">
+  <div class="col-12 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h3 class="mb-3">Профиль</h3>
+        <div class="mb-2"><strong>Username:</strong> {{ request.user.username }}</div>
+        <div class="mb-2"><strong>Email:</strong> {{ request.user.email }}</div>
+        <div class="mb-2"><strong>Телефон:</strong> {{ profile.phone_number|default:"—" }}</div>
+        <div class="mb-2"><strong>О себе:</strong><br>{{ profile.bio|default:"—" }}</div>
 
-    input.addEventListener('input', function () {
-      const q = input.value.trim().toLowerCase();
-      let visibleCount = 0;
+        <a class="btn btn-outline-primary mt-3 w-100" href="{% url 'message' %}">
+          Написать сообщение
+        </a>
+      </div>
+    </div>
+  </div>
 
-      items.forEach(item => {
-        const hay = item.getAttribute('data-search') || '';
-        const ok = hay.includes(q);
-        item.classList.toggle('d-none', !ok);
-        if (ok) visibleCount++;
-      });
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h3 class="mb-0">Мои сообщения</h3>
+          <span class="badge text-bg-secondary">{{ messages_list|length }}</span>
+        </div>
 
-      if (noResults) {
-        noResults.classList.toggle('d-none', visibleCount !== 0);
-      }
-    });
-  })();
-</script>
+        {% if messages_list %}
+          <div class="accordion" id="msgAccordion">
+            {% for m in messages_list %}
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ m.id }}">
+                  <button class="accordion-button collapsed" type="button"
+                          data-bs-toggle="collapse" data-bs-target="#collapse{{ m.id }}">
+                    <div class="w-100 d-flex justify-content-between">
+                      <span>{{ m.name }} — {{ m.email }}</span>
+                      <small class="text-muted ms-3">
+                        {{ m.created_at|date:"d.m.Y H:i" }}
+                      </small>
+                    </div>
+                  </button>
+                </h2>
+                <div id="collapse{{ m.id }}" class="accordion-collapse collapse" data-bs-parent="#msgAccordion">
+                  <div class="accordion-body">
+                    {{ m.text|linebreaksbr }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-warning mb-0">Сообщений пока нет.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

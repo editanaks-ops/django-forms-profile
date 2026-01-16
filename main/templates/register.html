@@ -1,24 +1,58 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <title>Регистрация</title>
-</head>
-<body>
-  <h1>Регистрация</h1>
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
 
-  {% if messages %}
-    {% for m in messages %}
-      <p>{{ m }}</p>
-    {% endfor %}
-  {% endif %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="mb-3">Регистрация</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Зарегистрироваться</button>
-  </form>
+        <form method="post" novalidate>
+          {% csrf_token %}
 
-  <p><a href="{% url 'login' %}">Войти</a></p>
-</body>
-</html>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Имя пользователя</label>
+              <input class="form-control" name="username" value="{{ form.username.value|default:'' }}">
+              {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input class="form-control" name="email" value="{{ form.email.value|default:'' }}">
+              {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Пароль</label>
+              <input class="form-control" type="password" name="password1">
+              {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Повторите пароль</label>
+              <input class="form-control" type="password" name="password2">
+              {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Телефон</label>
+            <input class="form-control" name="phone_number" value="{{ form.phone_number.value|default:'' }}">
+            {% if form.phone_number.errors %}<div class="text-danger small">{{ form.phone_number.errors }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">О себе</label>
+            <textarea class="form-control" name="bio" rows="3">{{ form.bio.value|default:'' }}</textarea>
+            {% if form.bio.errors %}<div class="text-danger small">{{ form.bio.errors }}</div>{% endif %}
+          </div>
+
+          <button class="btn btn-success w-100">Создать аккаунт</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

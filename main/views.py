@@ -4,15 +4,36 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 
-from .forms import LoginForm, MessageForm, RegistrationForm  # ВАЖНО: одно имя формы регистрации
-from .models import Message
+from .forms import LoginForm, RegistrationForm, MessageForm
+from .models import Profile, Message
+
+
+def home_view(request):
+    # Если уже авторизован — сразу профиль
+    if request.user.is_authenticated:
+        return redirect("profile")
+    return redirect("login")
 
 
 def register_view(request):
+    # Если уже авторизован — не надо регистрироваться
+    if request.user.is_authenticated:
+        return redirect("profile")
+
     if request.method == "POST":
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+
+            # если Profile не создан (на всякий случай) — создаём
+            Profile.objects.get_or_create(
+                user=user,
+                defaults={
+                    "phone_number": form.cleaned_data.get("phone_number", ""),
+                    "bio": form.cleaned_data.get("bio", ""),
+                },
+            )
+
             login(request, user)
             messages.success(request, "Регистрация успешна. Вы вошли в систему.")
             return redirect("profile")
@@ -25,7 +46,12 @@ def register_view(request):
 
 
 def login_view(request):
-    next_url = request.GET.get("next") or request.POST.get("next")
+    # берем next из GET или POST
+    next_url = request.GET.get("next") or request.POST.get("next") or ""
+
+    # если уже залогинен — сразу в профиль
+    if request.user.is_authenticated:
+        return redirect("profile")
 
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -39,7 +65,7 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, "Вы вошли в систему.")
 
-                # безопасный редирект на next (если был)
+                # редиректим только если next безопасный
                 if next_url and url_has_allowed_host_and_scheme(
                     next_url,
                     allowed_hosts={request.get_host()},
@@ -66,22 +92,34 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    msgs = request.user.messages.order_by("-created_at")
-    return render(request, "profile.html", {"messages_list": msgs})
+    # профиль должен быть — но на всякий случай
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    # сообщения пользователя (если модель Message связана с user)
+    messages_list = Message.objects.filter(user=request.user).order_by("-id")
+
+    return render(
+        request,
+        "profile.html",
+        {
+            "profile": profile,
+            "messages_list": messages_list,
+        },
+    )
 
 
+@login_required
 def message_create_view(request):
     if request.method == "POST":
         form = MessageForm(request.POST)
         if form.is_valid():
             msg = form.save(commit=False)
-            if request.user.is_authenticated:
-                msg.user = request.user
+            msg.user = request.user
             msg.save()
             messages.success(request, "Сообщение отправлено.")
-            return redirect("profile" if request.user.is_authenticated else "message")
+            return redirect("profile")
         else:
-            messages.error(request, "Проверьте сообщение.")
+            messages.error(request, "Проверьте введённые данные.")
     else:
         form = MessageForm()
 
