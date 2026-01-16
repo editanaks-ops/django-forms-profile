@@ -1,40 +1,18 @@
-# Python
-__pycache__/
-*.py[cod]
-
-# Django
-db.sqlite3
-*.log
-local_settings.py
-
-# Virtual env
+# Виртуальное окружение
 venv/
+env/
 .env/
-.venv/
 
-# IDE
+# База данных
+db.sqlite3
+
+# PyCharm
 .idea/
-.vscode/
 
-# OS
-.DS_Store
-Thumbs.db
-# Python
+# Python кэш
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
 
-# Django
-db.sqlite3
-*.log
-
-# Virtualenv
-venv/
-.env
-.env.*
-
-# OS/IDE
-.DS_Store
-.idea/
-.vscode/
+# Django статика/медиа (если есть)
+media/
+staticfiles/
